@@ -1,9 +1,0 @@
-#Storeing Button
-str_btn = customtkinter.CTkButton(master=root,text='store',command=storeing_data,width=200,height=40,corner_radius=20,
-                                      font=('Century Gothic',20))
-str_btn.place(relx=0.5,rely=0.5,anchor=CENTER)
-
-#Loading Data
-ld_btn = customtkinter.CTkButton(master=root,text='Load',command=loading_data,width=200,height=40,corner_radius=20,
-                                      font=('Century Gothic',20))
-ld_btn.place(relx=0.5,rely=0.6,anchor=CENTER)
