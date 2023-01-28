@@ -40,44 +40,21 @@ def Date():
     current_date = current_date.strftime("%B %d, %Y")
     date_label.configure(text=current_date)
 
-def storeing_data():
-    t_and_d=time.localtime()
-    current_year  = t_and_d.tm_year
-    current_month = t_and_d.tm_mon
-    current_day   = t_and_d.tm_mday
-    current_min   = t_and_d.tm_min
-    data_base = {}
-    data_base[0]=current_year
-    data_base[1]=current_month
-    data_base[2]=current_day
-    data_base[3]=current_min
-    data_base_file=open('d_&_t','ab')
-    pickle.dump(data_base,data_base_file)
-    data_base_file.close
-
-def loading_data():
-    data_base_file=open('d_&_t','rb')
-    data_base=pickle.load(data_base_file)
-    print(data_base)
-    for keys in data_base:
-        print(keys, '=>', data_base[keys])
-    data_base_file.close
-
-def check_box_a():
+def check_box():
     var_a = check_box_nutrition_a.get()
     var_b = check_box_nutrition_b.get()
+    if var_a == 'nutrition_a_on':
+        check_box_nutrition_a.configure(text='Added Nutriant A')
+    else:
+        check_box_nutrition_a.configure(text=' ')
+    if var_b == 'nutrition_b_on':
+        check_box_nutrition_b.configure(text='Added Nutriant B') 
+    else:
+        check_box_nutrition_b.configure(text=' ') 
     if var_a == 'nutrition_a_on' and var_b == 'nutrition_b_on':
         save_button_nutrition.configure(state='normal')
     else:
         save_button_nutrition.configure(state='disabled')
-
-def check_box_b():
-    var_a = check_box_nutrition_a.get()
-    var_b = check_box_nutrition_b.get() 
-    if var_a == 'nutrition_a_on' and var_b == 'nutrition_b_on':
-        save_button_nutrition.configure(state='normal')
-    else:
-        save_button_nutrition.configure(state='disabled')       
 
 #Clock 
 date_time_frame=customtkinter.CTkFrame(master=root,width=480,height=50,corner_radius=20,border_color='Green',border_width=2)
@@ -105,11 +82,11 @@ nutrient_a_label.place(relx=0.26,rely=0.3,anchor=CENTER)
 nutrient_b_label=customtkinter.CTkLabel(master=nutrition_frame,text='Nutrient B (20ml)',font=('Century Gothic', 30,),text_color='white')
 nutrient_b_label.place(relx=0.26,rely=0.5,anchor=CENTER)
 check_box_nutrition_a=customtkinter.CTkCheckBox(master=nutrition_frame,text=' ',onvalue='nutrition_a_on',offvalue='nutrition_a_off',
-                                                command=check_box_a)
-check_box_nutrition_a.place(relx=0.65,rely=0.32,anchor=CENTER)
+                                                command=check_box,font=('Century Gothic', 20,))
+check_box_nutrition_a.place(relx=0.72,rely=0.32,anchor=CENTER)
 check_box_nutrition_b=customtkinter.CTkCheckBox(master=nutrition_frame,text=' ',onvalue='nutrition_b_on',offvalue='nutrition_b_off',
-                                                command=check_box_b)
-check_box_nutrition_b.place(relx=0.65,rely=0.51,anchor=CENTER)
+                                                command=check_box,font=('Century Gothic', 20,))
+check_box_nutrition_b.place(relx=0.72,rely=0.51,anchor=CENTER)
 save_button_nutrition=customtkinter.CTkButton(master=nutrition_frame,text='Save',width=150,height=30,corner_radius=20,font=('Century Gothic',20),
                                                     state='disabled')
 save_button_nutrition.place(relx=0.83,rely=0.9,anchor=CENTER)
