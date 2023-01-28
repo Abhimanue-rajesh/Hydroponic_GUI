@@ -98,6 +98,7 @@ check_box_nutrition_b.place(relx=0.65,rely=0.51,anchor=CENTER)
 #Water Frame
 water_frame=customtkinter.CTkFrame(master=root,width=500,height=250,corner_radius=20,border_color='Green',border_width=2)
 water_frame.place(relx=0.22,rely=0.7,anchor=CENTER)
+date_label_water=customtkinter.CTkLabel(master=water_frame)
 
 #looping root
 root.mainloop()
