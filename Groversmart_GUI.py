@@ -53,6 +53,22 @@ def check_box():
     else:
         save_button_nutrition.configure(state='disabled')
 
+def week_one():
+    print("1 pressed")
+    pass
+
+def week_two():
+    print("2 pressed")
+    pass
+
+def week_three():
+    print("3 pressed")
+    pass
+
+def week_four():
+    print("4 pressed")
+    pass
+
 #Clock 
 date_time_frame=customtkinter.CTkFrame(master=root,width=480,height=50,corner_radius=20,border_color='Green',border_width=2)
 date_time_frame.place(relx=0.5,rely=0.05,anchor=CENTER)
@@ -88,15 +104,14 @@ check_box_nutrition_b=customtkinter.CTkCheckBox(master=nutrition_frame,text=' ',
 check_box_nutrition_b.place(relx=0.7,rely=0.51,anchor=CENTER)
 save_button_nutrition=customtkinter.CTkButton(master=nutrition_frame,text='Save',width=150,height=30,corner_radius=20,font=fcg20,state='disabled')
 save_button_nutrition.place(relx=0.83,rely=0.88,anchor=CENTER)
-week_one_rdbtn=customtkinter.CTkRadioButton(master=nutrition_frame,text='Week One',value=1,command=check_box,font=fcg15)
+week_one_rdbtn=customtkinter.CTkRadioButton(master=nutrition_frame,text='Week One',value=1,font=fcg15,command=week_one)
 week_one_rdbtn.place(relx=0.7,rely=0.25)
-week_two_rdbtn=customtkinter.CTkRadioButton(master=nutrition_frame,text='Week Two',value=1,command=check_box,font=fcg15)
+week_two_rdbtn=customtkinter.CTkRadioButton(master=nutrition_frame,text='Week Two',value=1,font=fcg15,command=week_two)
 week_two_rdbtn.place(relx=0.7,rely=0.39)
-week_three_rdbtn=customtkinter.CTkRadioButton(master=nutrition_frame,text='Week Three',value=1,command=check_box,font=fcg15)
+week_three_rdbtn=customtkinter.CTkRadioButton(master=nutrition_frame,text='Week Three',value=1,font=fcg15,command=week_three)
 week_three_rdbtn.place(relx=0.7,rely=0.53)
-week_four_rdbtn=customtkinter.CTkRadioButton(master=nutrition_frame,text='Week Four',value=1,command=check_box,font=fcg15)
+week_four_rdbtn=customtkinter.CTkRadioButton(master=nutrition_frame,text='Week Four',value=1,font=fcg15,command=week_four)
 week_four_rdbtn.place(relx=0.7,rely=0.66)
-
 
 #Water Frame
 water_frame=customtkinter.CTkFrame(master=root,width=500,height=250,corner_radius=20,border_color='Green',border_width=2)
