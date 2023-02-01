@@ -53,6 +53,10 @@ def check_box():
     else:
         save_button_nutrition.configure(state='disabled')
 
+def selection():
+    print('selected'+str(week_var.get()))
+    pass
+
 def week_one():
     print("1 pressed")
     pass
@@ -69,6 +73,20 @@ def week_four():
     print("4 pressed")
     pass
 
+def refresh():
+   if isinstance(check_box_nutrition_a,customtkinter.CTkCheckBox):
+    check_box_nutrition_a.deselect()
+   if isinstance(check_box_nutrition_b,customtkinter.CTkCheckBox):
+    check_box_nutrition_b.deselect()
+   if isinstance(week_one_rdbtn,customtkinter.CTkRadioButton):
+    week_one_rdbtn.deselect()
+   if isinstance(week_two_rdbtn,customtkinter.CTkRadioButton):
+    week_two_rdbtn.deselect()
+   if isinstance(week_three_rdbtn,customtkinter.CTkRadioButton):
+    week_three_rdbtn.deselect()
+   if isinstance(week_four_rdbtn,customtkinter.CTkRadioButton):
+    week_four_rdbtn.deselect()
+  
 #Clock 
 date_time_frame=customtkinter.CTkFrame(master=root,width=480,height=50,corner_radius=20,border_color='Green',border_width=2)
 date_time_frame.place(relx=0.5,rely=0.05,anchor=CENTER)
@@ -104,13 +122,16 @@ check_box_nutrition_b=customtkinter.CTkCheckBox(master=nutrition_frame,text=' ',
 check_box_nutrition_b.place(relx=0.7,rely=0.51,anchor=CENTER)
 save_button_nutrition=customtkinter.CTkButton(master=nutrition_frame,text='Save',width=150,height=30,corner_radius=20,font=fcg20,state='disabled')
 save_button_nutrition.place(relx=0.83,rely=0.88,anchor=CENTER)
-week_one_rdbtn=customtkinter.CTkRadioButton(master=nutrition_frame,text='Week One',value=1,font=fcg15,command=week_one)
+reset_button=customtkinter.CTkButton(master=nutrition_frame,text='Clear',width=50,height=20,command=refresh)
+reset_button.place(relx=0.85,rely=0.1)
+week_var= IntVar()
+week_one_rdbtn=customtkinter.CTkRadioButton(master=nutrition_frame,text='Week One',variable=week_var,value=1,font=fcg15,command=week_one)
 week_one_rdbtn.place(relx=0.7,rely=0.25)
-week_two_rdbtn=customtkinter.CTkRadioButton(master=nutrition_frame,text='Week Two',value=1,font=fcg15,command=week_two)
+week_two_rdbtn=customtkinter.CTkRadioButton(master=nutrition_frame,text='Week Two',variable=week_var,value=2,font=fcg15,command=week_two)
 week_two_rdbtn.place(relx=0.7,rely=0.39)
-week_three_rdbtn=customtkinter.CTkRadioButton(master=nutrition_frame,text='Week Three',value=1,font=fcg15,command=week_three)
+week_three_rdbtn=customtkinter.CTkRadioButton(master=nutrition_frame,text='Week Three',variable=week_var,value=3,font=fcg15,command=week_three)
 week_three_rdbtn.place(relx=0.7,rely=0.53)
-week_four_rdbtn=customtkinter.CTkRadioButton(master=nutrition_frame,text='Week Four',value=1,font=fcg15,command=week_four)
+week_four_rdbtn=customtkinter.CTkRadioButton(master=nutrition_frame,text='Week Four',variable=week_var,value=4,font=fcg15,command=week_four)
 week_four_rdbtn.place(relx=0.7,rely=0.66)
 
 #Water Frame
