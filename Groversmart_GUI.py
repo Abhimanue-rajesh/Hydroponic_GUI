@@ -1,14 +1,15 @@
-import customtkinter
-import time 
 import pickle
-
-from customtkinter import *
+import time
+from datetime import date, datetime
 from tkinter import *
-from datetime import date
-from datetime import datetime
+
+import customtkinter
+from customtkinter import *
 from dateutil.parser import parse
 from dateutil.relativedelta import relativedelta
 from tkcalendar import DateEntry
+from os import path
+
 
 #Theme and apperance of main window
 customtkinter.set_appearance_mode("dark")
@@ -54,26 +55,41 @@ def check_box():
     else:
         save_button_nutrition.configure(state='disabled')
 
-def selection():
-    print('selected'+str(week_var.get()))
-    pass
+def save_dates_alert():
+   save_file= open('dates.pickle','wb')
+   pickle.dump(date_data_list,save_file)
+   print('saved')
+   save_file.close
+
 
 def week_one():
-    print("1 pressed")
-    pass
-
-def week_two():
-    print("2 pressed")
-    pass
-
-def week_three():
-    print("3 pressed")
-    pass
-
-def week_four():
-    print("4 pressed")
-    pass
-
+    global date_data_list
+    file_presence = str(path.exists('dates.pickle'))
+    print(file_presence)
+    if file_presence == 'True':
+       read_file=open('dates.pickle','rb')
+       date_data_list = pickle.load(read_file)
+       info_display_text.configure(state='normal')
+       info_display_text.insert("0.0", date_data_list)
+       info_display_text.configure(state='disabled')
+    else:
+       week = relativedelta(days=+7)
+       datetime_now = datetime.now()
+       first_week =datetime_now+week
+       second_week=first_week+week
+       third_week=second_week+week
+       fourth_week=third_week+week
+       first_day=str(datetime_now.date())
+       first_week_date=str(first_week.date())
+       second_week_date=str(second_week.date())
+       third_week_date=str(third_week.date())
+       fourth_week_date=str(fourth_week.date())
+       date_data_list={'Initaial Date':first_day,'First Week':first_week_date,
+                    'Second Week':second_week_date,'Third Week':third_week_date,
+                    'Fourth Week':fourth_week_date}
+       info_display_text.insert("0.0", date_data_list)
+       save_dates_alert()
+    
 def refresh():
    if isinstance(check_box_nutrition_a,customtkinter.CTkCheckBox):
     check_box_nutrition_a.deselect()
@@ -103,6 +119,8 @@ def next_refil_water():
     week = relativedelta(days=+7)
     print(date_data+week)
 
+def next_date_for_nutriant_refill():
+    pass
 
 date_time_frame=customtkinter.CTkFrame(master=root,width=480,height=50,corner_radius=20,border_color='Green',border_width=2)
 time_label = customtkinter.CTkLabel(master=date_time_frame, font=fcg30)
@@ -119,7 +137,7 @@ exit_button = customtkinter.CTkButton(master=root, text= "Exit", command=root.de
 exit_button.place(relx=0.9,rely=0.95,anchor=CENTER)
 
 #Nutrition Frame
-nutrition_frame=customtkinter.CTkFrame(master=root,width=500,height=250,corner_radius=20,border_color='Green',border_width=2)
+nutrition_frame=customtkinter.CTkFrame(master=root,width=500,height=300,corner_radius=20,border_color='Green',border_width=2)
 top_label_nutrition=customtkinter.CTkLabel(master=nutrition_frame,text='Nutritional Information',font=('Century Gothic',30,UNDERLINE),
                                             text_color='Yellow')
 nutrient_a_label=customtkinter.CTkLabel(master=nutrition_frame,text='Nutrient A (20ml)',font=fcg30,text_color='white')
@@ -133,10 +151,10 @@ save_button_nutrition=customtkinter.CTkButton(master=nutrition_frame,text='Save'
 reset_button=customtkinter.CTkButton(master=nutrition_frame,text='Clear All',width=50,height=20,command=refresh,fg_color='Red4',hover_color='Red4')
 week_var= IntVar()
 week_one_rdbtn=customtkinter.CTkRadioButton(master=nutrition_frame,text='Week One',variable=week_var,value=1,font=fcg15,command=week_one)
-week_two_rdbtn=customtkinter.CTkRadioButton(master=nutrition_frame,text='Week Two',variable=week_var,value=2,font=fcg15,command=week_two)
-week_three_rdbtn=customtkinter.CTkRadioButton(master=nutrition_frame,text='Week Three',variable=week_var,value=3,font=fcg15,command=week_three)
-week_four_rdbtn=customtkinter.CTkRadioButton(master=nutrition_frame,text='Week Four',variable=week_var,value=4,font=fcg15,command=week_four)
-nutrition_frame.place(relx=0.22,rely=0.3,anchor=CENTER)
+week_two_rdbtn=customtkinter.CTkRadioButton(master=nutrition_frame,text='Week Two',variable=week_var,value=2,font=fcg15,state='disabled')
+week_three_rdbtn=customtkinter.CTkRadioButton(master=nutrition_frame,text='Week Three',variable=week_var,value=3,font=fcg15,state='disabled')
+week_four_rdbtn=customtkinter.CTkRadioButton(master=nutrition_frame,text='Week Four',variable=week_var,value=4,font=fcg15,state='disabled')
+nutrition_frame.place(relx=0.22,rely=0.33,anchor=CENTER)
 top_label_nutrition.place(relx=0.5,rely=0.1,anchor=CENTER)
 nutrient_a_label.place(relx=0.29,rely=0.3,anchor=CENTER)
 nutrient_b_label.place(relx=0.29,rely=0.5,anchor=CENTER)
@@ -151,7 +169,7 @@ week_three_rdbtn.place(relx=0.7,rely=0.53)
 week_four_rdbtn.place(relx=0.7,rely=0.66)
 
 #Water Frame
-water_frame=customtkinter.CTkFrame(master=root,width=500,height=250,corner_radius=20,border_color='Green',border_width=2)
+water_frame=customtkinter.CTkFrame(master=root,width=500,height=200,corner_radius=20,border_color='Green',border_width=2)
 save_button_water=customtkinter.CTkButton(master=water_frame,text='Save',width=150,height=30,corner_radius=20,font=fcg20,state='disabled')
 top_label_water=customtkinter.CTkLabel(master=water_frame,text='Water Replenishment',font=('Century Gothic',30,UNDERLINE),
                                             text_color='Yellow')
@@ -161,12 +179,14 @@ date_change_var=StringVar()
 date_selector=DateEntry(master=water_frame,selectmode='day',date_pattern='yyyy-mm-dd',textvariable=date_change_var)
 date_selector.set_date(date.today())
 date_change_var.trace('w',date_update)
+info_water=customtkinter.CTkTextbox(master=water_frame,width=300,height=80,state='disabled',corner_radius=10,border_width=2,font=fcg15)
 water_frame.place(relx=0.22,rely=0.7,anchor=CENTER)
-save_button_water.place(relx=0.83,rely=0.9,anchor=CENTER)
+save_button_water.place(relx=0.83,rely=0.77,anchor=CENTER)
 top_label_water.place(relx=0.5,rely=0.1,anchor=CENTER)
 date_label_water.place(relx=0.25,rely=0.3,anchor=CENTER)
 date_selector.place(relx=0.47,rely=0.26)
 date_clear.place(relx=0.83,rely=0.3,anchor=CENTER)
+info_water.place(relx=0.35,rely=0.65,anchor=CENTER)
 
 #Data Display Frame 
 data_display_frame=customtkinter.CTkFrame(master=root,width=300,height=250,corner_radius=20,border_color='Green',border_width=2)
