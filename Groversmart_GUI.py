@@ -40,13 +40,13 @@ def Time():
     new_time = time.strftime('%H:%M:%S')
     if current_time != new_time:
         current_time=new_time
-        time_label.configure(text=new_time)
-    time_label.after(200,Time)    
+        time_lbl.configure(text=new_time)
+    time_lbl.after(200,Time)    
 
 def Date():
     current_date = date.today()
-    current_date = current_date.strftime("%B %d, %Y")
-    date_label.configure(text=current_date)
+    current_date = current_date.strftime("%d %B %Y")
+    date_lbl.configure(text=current_date)
 
 def check_box():
     var_a = check_box_nutrition_a.get()
@@ -56,23 +56,21 @@ def check_box():
     else:
         save_button_nutrition.configure(state='disabled')
 
-def save_dates_alert():
-   save_file= open('dates.pickle','wb')
-   pickle.dump(date_data_list,save_file)
-   print('saved')
-   save_file.close
-
+def save_to_file():
+   with open ('date.txt','w') as write_file:
+       for key , value in date_data_dictionary.items():
+           write_file.write('%s :  %s\n'%(key , value))
+       write_file.close()    
+    
 def load_dates():
-    global date_data_list
-    week_one_rdbtn.configure(state='disabled')
-    file_presence = str(path.exists('dates.pickle'))
+    global date_data_dictionary
+    file_presence = str(path.exists('date.txt'))
     if file_presence == 'True':
-       read_file=open('dates.pickle','rb')
-       date_data_list = pickle.load(read_file)
+       with open('date.txt','r') as read_file:
+           date_data=read_file.read()
+           read_file.close()
        info_display_text.configure(state='normal')
-       result =json.dumps(date_data_list,sort_keys=True,indent=4)
-       new_result=result.replace('{','').replace('}','').replace('"','').replace(',','',10)
-       info_display_text.insert(END, new_result) 
+       info_display_text.insert('0.0', date_data)
        info_display_text.configure(state='disabled')
     else:
        week = relativedelta(days=+7)
@@ -86,58 +84,94 @@ def load_dates():
        second_week_date=str(second_week.date())
        third_week_date=str(third_week.date())
        fourth_week_date=str(fourth_week.date())
-       date_data_list={'Initaial Date':first_day,
+       date_data_dictionary={'Initaial Date':first_day,
                        'First Week':first_week_date,
                        'Second Week':second_week_date,
                        'Third Week':third_week_date,
                        'Fourth Week':fourth_week_date}
-       info_display_text.insert("0.0", date_data_list)
-       save_dates_alert()
+       save_to_file()
+       updating_date_in_tracker_frame()
+       with open('date.txt','r') as read_file:
+           date_data=read_file.read()
+           read_file.close()
+       info_display_text.configure(state='normal')
+       info_display_text.insert('0.0', date_data)
+       info_display_text.configure(state='disabled')
     
 def refresh():
    if isinstance(check_box_nutrition_a,customtkinter.CTkCheckBox):
-    check_box_nutrition_a.deselect()
+      check_box_nutrition_a.deselect()
+      check_box_nutrition_a.configure(state='disabled')
    if isinstance(check_box_nutrition_b,customtkinter.CTkCheckBox):
-    check_box_nutrition_b.deselect()
+      check_box_nutrition_b.deselect()
+      check_box_nutrition_b.configure(state='disabled')
    if isinstance(week_one_rdbtn,customtkinter.CTkRadioButton):
-    week_one_rdbtn.deselect()
+      week_one_rdbtn.deselect()
    if isinstance(week_two_rdbtn,customtkinter.CTkRadioButton):
-    week_two_rdbtn.deselect()
+      week_two_rdbtn.deselect()
    if isinstance(week_three_rdbtn,customtkinter.CTkRadioButton):
-    week_three_rdbtn.deselect()
+      week_three_rdbtn.deselect()
    if isinstance(week_four_rdbtn,customtkinter.CTkRadioButton):
-    week_four_rdbtn.deselect()
+      week_four_rdbtn.deselect()
+   if isinstance(info_display_text,customtkinter.CTkTextbox):
+      info_display_text.configure(state='normal')
+      info_display_text.delete("0.0", "end")
+      info_display_text.configure(state='disabled')
 
-#to get the date in loop--whenever the user changes the date input  
-def date_update(*args):
-    global date_data
-    date_data=date_selector.get()
-    if len(date_data)==0:
-        save_button_water.configure(state='disabled')
-    else:
-        save_button_water.configure(state='normal')
-
-def next_refil_water():
-    print(date_data)
-    date_data=parse(date_data)
-    week = relativedelta(days=+7)
-    print(date_data+week)
-
-def next_date_for_nutriant_refill():        
-    pass
+def updating_date_in_tracker_frame():
+   file_presence = str(path.exists('date.txt'))
+   if file_presence == 'True':
+       with open('date.txt','r') as read_file:
+           date_data=read_file.read()
+           date_data_list=date_data.splitlines()
+           splited_date_initial=date_data_list[0].split()
+           splited_date_first=date_data_list[1].split()
+           splited_date_second=date_data_list[2].split()
+           splited_date_third=date_data_list[3].split()
+           splited_date_fourth=date_data_list[4].split()
+           today_lbl.configure(text='• \n'+splited_date_initial[3])
+           month_one_lbl.configure(text='• \n'+splited_date_first[3]) 
+           month_two_lbl.configure(text='• \n'+splited_date_second[3]) 
+           month_three_lbl.configure(text='• \n'+splited_date_third[3])  
+           month_four_lbl.configure(text='• \n'+splited_date_fourth[3])
+           read_file.close()
 
 def show_info():
    messagebox.showinfo("Nutritional Information", "1.Choose the week \n 2.Next mark the added nutritions \n 3. Save ")
-   
+
+def enabling_check_box():
+    check_box_nutrition_a.configure(state='normal')
+    check_box_nutrition_b.configure(state='normal')
+
+def moving_tracker():
+    today = datetime.now()
+    file_presence = str(path.exists('date.txt'))
+    if file_presence == 'True':
+        with open('date.txt','r') as read_file:
+           date_data=read_file.read()
+           date_data_list=date_data.splitlines()
+           splited_date_first=date_data_list[1].split()
+           splited_date_second=date_data_list[2].split()
+           splited_date_third=date_data_list[3].split()
+           splited_date_fourth=date_data_list[4].split()
+           if splited_date_first[3] == today:
+              tracker.set(0.25)
+           if splited_date_second[3] == today:
+               tracker.set(0.503)
+           if splited_date_third[3] == today:
+               tracker.set(0.755)
+           if splited_date_fourth[3]==today:
+               tracker.set(1) 
+              
 #Date ,Time and mainheading Frame
 date_time_frame=customtkinter.CTkFrame(master=root,width=1300,height=100,corner_radius=20,border_color='Green',border_width=2)
-time_label = customtkinter.CTkLabel(master=date_time_frame, font=fcg30)
-date_label = customtkinter.CTkLabel(master=date_time_frame, font=fcg30)
-main_heading = customtkinter.CTkLabel(master=date_time_frame,text='Hydroponic System',font=fcg45,text_color='white')
+time_lbl = customtkinter.CTkLabel(master=date_time_frame, font=fcg30)
+date_lbl = customtkinter.CTkLabel(master=date_time_frame, font=fcg30)
+main_heading_lbl = customtkinter.CTkLabel(master=date_time_frame,text='Hydroponic System',font=fcg45,text_color='white')
 date_time_frame.place(relx=0.5,rely=0.08,anchor=CENTER)
-time_label.place(relx=0.03,rely=0.1)
-date_label.place(relx=0.03,rely=0.5)
-main_heading.place(relx=0.65,rely=0.27)
+time_lbl.place(relx=0.03,rely=0.1)
+date_lbl.place(relx=0.03,rely=0.5)
+main_heading_lbl.place(relx=0.65,rely=0.27)
 Time()
 Date()
 
@@ -150,64 +184,58 @@ exit_button.place(relx=0.9,rely=0.95,anchor=CENTER)
 nutrition_frame=customtkinter.CTkFrame(master=root,width=450,height=300,corner_radius=20,border_color='Green',border_width=2)
 top_label_nutrition=customtkinter.CTkLabel(master=nutrition_frame,text='Nutritional Information',font=('Century Gothic',30,UNDERLINE),
                                             text_color='Yellow')
-nutrient_a_label=customtkinter.CTkLabel(master=nutrition_frame,text='Nutrient A (20ml)',font=fcg20,text_color='white')
+nutrient_a_lbl=customtkinter.CTkLabel(master=nutrition_frame,text='Nutrient A (20ml)',font=fcg20,text_color='white')
 nutrient_b_label=customtkinter.CTkLabel(master=nutrition_frame,text='Nutrient B (20ml)',font=fcg20,text_color='white')
-info_display_text=customtkinter.CTkTextbox(master=nutrition_frame,width=270,height=60,state='disabled',corner_radius=3,border_spacing=0,
-                                           border_width=2,font=fcg15)
+info_display_text=customtkinter.CTkTextbox(master=nutrition_frame,width=300,height=110,state='disabled',corner_radius=5,border_width=2,font=fcg15)
 check_box_nutrition_a=customtkinter.CTkCheckBox(master=nutrition_frame,text=' ',onvalue='nutrition_a_on',offvalue='nutrition_a_off',
                                                 command=check_box,font=fcg20,state='disabled')
 check_box_nutrition_b=customtkinter.CTkCheckBox(master=nutrition_frame,text=' ',onvalue='nutrition_b_on',offvalue='nutrition_b_off',
                                                 command=check_box,font=fcg20,state='disabled')
-save_button_nutrition=customtkinter.CTkButton(master=nutrition_frame,text='Save',width=150,height=30,corner_radius=20,font=fcg20,state='disabled')
+save_button_nutrition=customtkinter.CTkButton(master=nutrition_frame,text='Save',width=120,height=30,corner_radius=20,font=fcg20,state='disabled',
+                                              command=load_dates)
 reset_button=customtkinter.CTkButton(master=nutrition_frame,text='Clear All',width=50,height=20,command=refresh,fg_color='Red4',hover_color='Red4')
 week_var= IntVar()
-week_one_rdbtn=customtkinter.CTkRadioButton(master=nutrition_frame,text='Week One',variable=week_var,value=1,font=fcg15,command=load_dates)
+week_one_rdbtn=customtkinter.CTkRadioButton(master=nutrition_frame,text='Week One',variable=week_var,value=1,font=fcg15,command=enabling_check_box)
 week_two_rdbtn=customtkinter.CTkRadioButton(master=nutrition_frame,text='Week Two',variable=week_var,value=2,font=fcg15,state='disabled')
 week_three_rdbtn=customtkinter.CTkRadioButton(master=nutrition_frame,text='Week Three',variable=week_var,value=3,font=fcg15,state='disabled')
 week_four_rdbtn=customtkinter.CTkRadioButton(master=nutrition_frame,text='Week Four',variable=week_var,value=4,font=fcg15,state='disabled')
-show_info_btn=customtkinter.CTkButton(master=nutrition_frame,text='i',width=20,height=20,corner_radius=20,command=show_info,
-                                      font=('Century Gothic',25,'italic'))
-nutrition_frame.place(relx=0.2,rely=0.38,anchor=CENTER)
+show_info_btn=customtkinter.CTkButton(master=nutrition_frame,text='i',width=20,height=20,corner_radius=20,command=show_info,font=('Times',25,'italic'))
+nutrition_frame.place(relx=0.18,rely=0.38,anchor=CENTER)
 top_label_nutrition.place(relx=0.5,rely=0.1,anchor=CENTER)
-nutrient_a_label.place(relx=0.29,rely=0.3,anchor=CENTER)
-nutrient_b_label.place(relx=0.29,rely=0.5,anchor=CENTER)
-info_display_text.place(relx=0.35,rely=0.77,anchor=CENTER)
-check_box_nutrition_a.place(relx=0.7,rely=0.32,anchor=CENTER)
-check_box_nutrition_b.place(relx=0.7,rely=0.51,anchor=CENTER)
+nutrient_a_lbl.place(relx=0.25,rely=0.3,anchor=CENTER)
+nutrient_b_label.place(relx=0.25,rely=0.43,anchor=CENTER)
+check_box_nutrition_a.place(relx=0.6,rely=0.3,anchor=CENTER)
+check_box_nutrition_b.place(relx=0.6,rely=0.43,anchor=CENTER)
 save_button_nutrition.place(relx=0.83,rely=0.88,anchor=CENTER)
-reset_button.place(relx=0.85,rely=0.1)
+info_display_text.place(relx=0.02,rely=0.5)
+reset_button.place(relx=0.05,rely=0.9)
 week_one_rdbtn.place(relx=0.7,rely=0.25)
 week_two_rdbtn.place(relx=0.7,rely=0.39)
 week_three_rdbtn.place(relx=0.7,rely=0.53)
 week_four_rdbtn.place(relx=0.7,rely=0.66)
-show_info_btn.place(relx=0.1,rely=0.1)
+show_info_btn.place(relx=0.9,rely=0.05)
 
-#Water Frame
-water_frame=customtkinter.CTkFrame(master=root,width=500,height=200,corner_radius=20,border_color='Green',border_width=2)
-save_button_water=customtkinter.CTkButton(master=water_frame,text='Save',width=150,height=30,corner_radius=20,font=fcg20,state='disabled')
-top_label_water=customtkinter.CTkLabel(master=water_frame,text='Water Replenishment',font=('Century Gothic',30,UNDERLINE),
+#Trcking Data
+tracking_data_frame=customtkinter.CTkFrame(master=root,width=840,height=200,corner_radius=20,border_color='Green',border_width=2)
+tracking_main_lbl=customtkinter.CTkLabel(master=tracking_data_frame,text='Progress',font=('Century Gothic',30,UNDERLINE),
                                             text_color='Yellow')
-date_label_water=customtkinter.CTkLabel(master=water_frame,text='Last Water Change',font=fcg20,text_color='white')
-date_clear=customtkinter.CTkButton(master=water_frame,text='Clear Selection',font=fcg15,hover_color='Red4',command=lambda:date_selector.delete(0,'end'))
-date_change_var=StringVar()
-date_selector=DateEntry(master=water_frame,selectmode='day',date_pattern='yyyy-mm-dd',textvariable=date_change_var)
-date_selector.set_date(date.today())
-date_change_var.trace('w',date_update)
-info_water=customtkinter.CTkTextbox(master=water_frame,width=300,height=80,state='disabled',corner_radius=10,border_width=2,font=fcg15)
-water_frame.place(relx=0.22,rely=0.75,anchor=CENTER)
-save_button_water.place(relx=0.83,rely=0.77,anchor=CENTER)
-top_label_water.place(relx=0.5,rely=0.1,anchor=CENTER)
-date_label_water.place(relx=0.25,rely=0.3,anchor=CENTER)
-date_selector.place(relx=0.47,rely=0.26)
-date_clear.place(relx=0.83,rely=0.3,anchor=CENTER)
-info_water.place(relx=0.35,rely=0.65,anchor=CENTER)
-
-#Data Display Frame 
-data_display_frame=customtkinter.CTkFrame(master=root,width=300,height=250,corner_radius=20,border_color='Green',border_width=2)
-data_display_frame_label=customtkinter.CTkLabel(master=data_display_frame,text='Data',font=('Century Gothic',30,UNDERLINE),
-                                            text_color='Yellow')
-data_display_frame.place(relx=0.55,rely=0.5,anchor=CENTER)
-data_display_frame_label.place(relx=0.5,rely=0.1,anchor=CENTER)
+tracker=customtkinter.CTkProgressBar(master=tracking_data_frame,width=678,height=10,corner_radius=10,mode='determinate')
+tracker.set(0)
+today_lbl=customtkinter.CTkLabel(master=tracking_data_frame,text=' • \n Start',font=fcg20,text_color='white')
+month_one_lbl=customtkinter.CTkLabel(master=tracking_data_frame,text=' • \n Week \n One',font=fcg20,text_color='white')
+month_two_lbl=customtkinter.CTkLabel(master=tracking_data_frame,text='• \n Week \n Two',font=fcg20,text_color='white')
+month_three_lbl=customtkinter.CTkLabel(master=tracking_data_frame,text='• \n Week \n Three',font=fcg20,text_color='white')
+month_four_lbl=customtkinter.CTkLabel(master=tracking_data_frame,text='• \n Week \n Four',font=fcg20,text_color='white')
+tracking_data_frame.place(relx=0.67,rely=0.31,anchor=CENTER)
+tracker.place(relx=0.505,rely=0.3,anchor=CENTER)
+tracking_main_lbl.place(relx=0.5,rely=0.1,anchor=CENTER)
+today_lbl.place(relx=0.05,rely=0.45)
+month_one_lbl.place(relx=0.25,rely=0.45)
+month_two_lbl.place(relx=0.45,rely=0.45)
+month_three_lbl.place(relx=0.65,rely=0.45)
+month_four_lbl.place(relx=0.85,rely=0.45)
+updating_date_in_tracker_frame()
+moving_tracker()
 
 #looping root
 root.mainloop()
