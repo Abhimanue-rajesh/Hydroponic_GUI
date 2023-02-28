@@ -36,6 +36,7 @@ fcg17=customtkinter.CTkFont('Century Gothic',17)
 fcg20=customtkinter.CTkFont('Century Gothic',20)
 fcg30=customtkinter.CTkFont('Century Gothic',30)
 fcg45=customtkinter.CTkFont('Century Gothic',45)
+fcgbtn=customtkinter.CTkFont('Century Gothic',19,'bold')
 
 #Functions
 def Time():
@@ -58,12 +59,13 @@ def tds_input_event():
         input_from_dialog = int(tds_input_dialog.get_input())
         error_lbl_main.configure(text=" ") 
         if input_from_dialog <= 250:
-            print('TDS Value is LOW')
+            error_lbl_main.configure(text='TDS Value is Low',text_color='red')
         elif input_from_dialog > 250 and input_from_dialog < 300:
+            error_lbl_main.configure(text='TDS Value has been saved',text_color='Green')
             create_csv_file()
             appending_tds_value()
         elif input_from_dialog > 300:
-            print('TDS Value is HIGH')
+            error_lbl_main.configure(text='TDS Value is High',text_color='red')
     except ValueError:
         error_lbl_main.configure(text="Entered Value is Not an Integer. Please Try Again")  
 
@@ -109,7 +111,7 @@ def week_calculator(day_today):
     second_week = second_week.strftime('%d-%m-%Y')
     third_week = third_week.strftime('%d-%m-%Y')
     fourth_week = fourth_week.strftime('%d-%m-%Y')
-    date_data_dictionary = {'Initaial Date':date_today,
+    date_data_dictionary = {'Initial Date':date_today,
                              'First Week':first_week,
                               'Second Week':second_week,
                                'Third Week':third_week,
@@ -126,9 +128,10 @@ def saving_curret_date():
         cstm_msgbx=messagebox.askokcancel('Additional Files Found!', 'Are You sure you want to continue?\n Additional Files will be cleared !')
         if cstm_msgbx == True:
             os.remove('dd_custom.json')
-    with open("dd_current.json", "w") as write_file:
+    else :
+     with open("dd_current.json", "w") as write_file:
                 json.dump(date_data_dictionary, write_file)
-                print('hello ')
+                messagebox.showinfo('Saved','Your Data has been Saved ')
 
 def saving_custom_date():
     presence_of_current_file = path.exists('dd_current.json')
@@ -136,8 +139,10 @@ def saving_custom_date():
         crnt_msgbx = messagebox.askokcancel('Additional Files Found!', 'Are You sure you want to continue?\n Additional Files will be cleared !')
         if crnt_msgbx == True:
             os.remove('dd_current.json')
-    with open("dd_custom.json", "w") as write_file:
+    else:
+     with open("dd_custom.json", "w") as write_file:
         json.dump(date_data_dictionary, write_file)
+        messagebox.showinfo('Saved','Your Data has been Saved ')
 
 def info_date():
     info_date = customtkinter.CTkToplevel(root)
@@ -191,20 +196,20 @@ nutrition_frame=customtkinter.CTkFrame(master=root,width=450,height=180,corner_r
 top_lbl_nutrition=customtkinter.CTkLabel(master=nutrition_frame,text='Date Selector',font=('Century Gothic',30,UNDERLINE),text_color='Yellow')
 calendar_custom_date = DateEntry(master=nutrition_frame,selectmode = 'day',width=10,font=fcg15,date_pattern='dd/mm/yyyy')
 custom_date_lbl=customtkinter.CTkLabel(master=nutrition_frame,text='Select a Custom Date :',font=fcg20,text_color='white')
-save_custom_date_btn=customtkinter.CTkButton(master=nutrition_frame,text='Save Custom Date',width=180,height=50,corner_radius=20,font=fcg17,command=custom_date)
-save_initial_date_btn=customtkinter.CTkButton(master=nutrition_frame,text='Save Current Date',width=180,height=50,corner_radius=20,font=fcg17,command=current_date)
+save_custom_date_btn=customtkinter.CTkButton(master=nutrition_frame,text='Save Custom Date',width=180,height=50,corner_radius=20,font=fcgbtn,command=custom_date)
+save_initial_date_btn=customtkinter.CTkButton(master=nutrition_frame,text='Save Current Date',width=180,height=50,corner_radius=20,font=fcgbtn,command=current_date)
 nutrition_frame.place(relx=0.18,rely=0.3,anchor=CENTER)
 top_lbl_nutrition.place(relx=0.5,rely=0.17,anchor=CENTER)
 custom_date_lbl.place(relx=0.33,rely=0.42,anchor=CENTER)
 calendar_custom_date.place(relx=0.75, rely=0.42,anchor=CENTER)
-save_custom_date_btn.place(relx=0.73, rely=0.75,anchor=CENTER)
-save_initial_date_btn.place(relx=0.27,rely=0.75,anchor=CENTER)
+save_initial_date_btn.place(relx=0.26,rely=0.75,anchor=CENTER)
+save_custom_date_btn.place(relx=0.74, rely=0.75,anchor=CENTER)
 
 #TDS Value Frame 
 tds_frame=customtkinter.CTkFrame(master=root,width=450,height=180,corner_radius=20,border_color='Green',border_width=2)
 top_lbl_tds = customtkinter.CTkLabel(master=tds_frame,text='TDS Value',font=('Century Gothic',30,UNDERLINE),text_color='Yellow')
 tds_lbl = customtkinter.CTkLabel(master=tds_frame,text="Mesure the TDS Value with a TDS Meter",font=fcg20,text_color='white')
-tds_value_input_btn=customtkinter.CTkButton(master=tds_frame,text='Input Todays TDS Value',width=180,height=50,corner_radius=20,font=fcg17,command=tds_input_event)
+tds_value_input_btn=customtkinter.CTkButton(master=tds_frame,text='Input Todays TDS Value',width=180,height=50,corner_radius=20,font=fcgbtn,command=tds_input_event)
 tds_lbl.place(relx=0.5,rely=0.45,anchor=CENTER)
 tds_value_input_btn.place(relx=0.5,rely=0.75,anchor=CENTER)
 top_lbl_tds.place(relx=0.5,rely=0.17,anchor=CENTER)
@@ -213,8 +218,8 @@ tds_frame.place(relx=0.528,rely=0.3,anchor=CENTER)
 #info frame
 info_frame=customtkinter.CTkFrame(master=root,width=375,height=180,corner_radius=20,border_color='Green',border_width=2)
 info_top_lbl=customtkinter.CTkLabel(master=info_frame,text='Information',font=('Century Gothic',30,UNDERLINE),text_color='Yellow')
-show_date_data_btn=customtkinter.CTkButton(master=info_frame,text='View Date Data',width=220,height=45,corner_radius=20,font=fcg17,command=info_date)
-show_tds_data_btn=customtkinter.CTkButton(master=info_frame,text='View TDS Data',width=220,height=45,corner_radius=20,font=fcg17,command=info_tds)
+show_date_data_btn=customtkinter.CTkButton(master=info_frame,text='View Date Data',width=220,height=45,corner_radius=20,font=fcgbtn,command=info_date)
+show_tds_data_btn=customtkinter.CTkButton(master=info_frame,text='View TDS Data',width=220,height=45,corner_radius=20,font=fcgbtn,command=info_tds)
 info_top_lbl.place(relx=0.5,rely=0.17,anchor=CENTER)
 show_date_data_btn.place(relx=0.5,rely=0.5,anchor=CENTER)
 show_tds_data_btn.place(relx=0.5,rely=0.8,anchor=CENTER)
@@ -228,8 +233,6 @@ error_lbl_main.place(relx=0.01,rely=0.94)
 exit_button = customtkinter.CTkButton(master=root, text= "Exit", command=root.destroy,width=200,height=40,corner_radius=20,font=fcg20,
                                       hover_color='Red4')
 exit_button.place(relx=0.9,rely=0.95,anchor=CENTER)
-
-#updated some files 
 
 #looping root
 root.mainloop()
