@@ -3,17 +3,23 @@ import json
 import time
 from datetime import date, datetime
 from os import path
-from tkinter import messagebox
+from tkinter import PhotoImage, messagebox,Label
 
 import customtkinter
+import cv2
+import numpy as np
 import pandas as pd
+import PIL.Image
+import tensorflow as tf
 from customtkinter import *
 from dateutil.parser import parse
 from dateutil.relativedelta import relativedelta
+from keras.models import load_model
+from PIL import ImageTk
 from tkcalendar import DateEntry
 
 #Theme and apperance of main window
-customtkinter.set_appearance_mode("dark")
+# customtkinter.set_appearance_mode("dark")
 customtkinter.set_default_color_theme("green")
 
 #Main_window_Feature_managment
@@ -21,6 +27,7 @@ root = customtkinter.CTk()
 root.title('Hydroponics')
 root.minsize(1330,690)
 root.maxsize(1330,690)
+root.configure(background='AntiqueWhite1')
 window_width = 1330
 window_height = 690
 screen_width = root.winfo_screenwidth()
@@ -30,6 +37,12 @@ center_y = int(screen_height/2 - window_height / 2)
 center_y_n = center_y - 35
 root.geometry(f'{window_width}x{window_height}+{center_x}+{center_y_n}')
 
+
+# background 
+photo = PhotoImage('bg.jpg')
+w = Label(root, image=photo)
+w.pack()
+
 #Fonts
 fcg15=customtkinter.CTkFont('Century Gothic',15)
 fcg17=customtkinter.CTkFont('Century Gothic',17)
@@ -37,6 +50,9 @@ fcg20=customtkinter.CTkFont('Century Gothic',20)
 fcg30=customtkinter.CTkFont('Century Gothic',30)
 fcg45=customtkinter.CTkFont('Century Gothic',45)
 fcgbtn=customtkinter.CTkFont('Century Gothic',19,'bold')
+
+# Machine Learning Model
+model = load_model(os.path.join('models','model_2.h5'))
 
 #Functions
 def Time():
@@ -67,7 +83,7 @@ def tds_input_event():
         elif input_from_dialog > 300:
             error_lbl_main.configure(text='TDS Value is High',text_color='red')
     except ValueError:
-        error_lbl_main.configure(text="Entered Value is Not an Integer. Please Try Again")  
+        error_lbl_main.configure(text="Entered Value is Not an Integer. Please Try Again")          
 
 def run_once(f):
     def wrapper(*args, **kwargs):
@@ -178,6 +194,42 @@ def info_tds():
         infolbl = customtkinter.CTkLabel(master=info_tds,text=data,width=600,height=170,corner_radius=2,font=fcg20)
         infolbl.place(relx=0.5,rely=0.5,anchor=CENTER)
 
+def select_image():
+    global img
+    file_position_var = filedialog.askopenfile(title="Select the Image With Supported Formats Only")
+    try:
+        file_path = file_position_var.name
+        if len(file_path) != 0:
+            display_info = 'Image Has Been Selected from :\n'+file_path
+            messagebox.showinfo('Image Selected',display_info)
+            image_input_frame.configure(border_color='Green')
+            open_image=PIL.Image.open(file_path)
+            resize_image=open_image.resize((350,350))
+            display_image = ImageTk.PhotoImage(resize_image)
+            image_input_label.configure(image=display_image)
+            img = cv2.imread(file_path)
+    except AttributeError:
+        error_lbl_main.configure(text='No File Selected',text_color='Red')
+        image_input_frame.configure(border_color='Red')
+
+def predict():
+    try:
+        resize = tf.image.resize(img, (256,256))
+        prediction=model.predict(np.expand_dims(resize/255, 0))
+        max_value = np.argmax(prediction)
+        if max_value == 0:
+            result_frame_label.configure(text='No Leaf Detected in the Image')
+        elif max_value == 1:
+            result_frame_label.configure(text='The Leaf Appears To Be Dead')
+        elif max_value == 2:
+            result_frame_label.configure(text='The Leaf Appears To Be Diseased')
+        elif max_value == 3:
+            result_frame_label.configure(text='The Leaf Appears To Be a Normal Leaf')
+        error_lbl_main.configure(text='Image Selected',text_color='Green')
+        image_input_frame.configure(border_color='Green')
+    except NameError:
+        error_lbl_main.configure(text='No Image Selected. Select an Image and Try Again',text_color='red')
+        image_input_frame.configure(border_color='Red')
 
 #Date ,Time and mainheading Frame
 date_time_frame=customtkinter.CTkFrame(master=root,width=1300,height=100,corner_radius=20,border_color='Green',border_width=2)
@@ -225,14 +277,34 @@ show_date_data_btn.place(relx=0.5,rely=0.5,anchor=CENTER)
 show_tds_data_btn.place(relx=0.5,rely=0.8,anchor=CENTER)
 info_frame.place(relx=0.85,rely=0.3,anchor=CENTER)
 
+#image input frame
+image_input_frame=customtkinter.CTkFrame(master=root,width=915,height=300,corner_radius=20,border_color='Green',border_width=2)
+image_input_label= customtkinter.CTkLabel(master = image_input_frame,text=' ',width=425,height=280,corner_radius=20,
+                                          font=fcg20,fg_color="gray21")
+image_selection_button=customtkinter.CTkButton(master=image_input_frame,text='Select Image',width=200,height=40,corner_radius=20,
+                                               font=fcgbtn,command=select_image)
+predict_button=customtkinter.CTkButton(master=image_input_frame,text='Predict',width=200,height=40,corner_radius=20,font=fcgbtn,
+                                       command=predict)
+image_selection_button.place(relx=0.77,rely=0.4,anchor=CENTER)
+predict_button.place(relx=0.77,rely=0.6,anchor=CENTER)
+image_input_label.place(relx=0.25,rely=0.5,anchor=CENTER)
+image_input_frame.place(relx=0.356,rely=0.67,anchor=CENTER)
+
+#result output frame 
+result_output_frame=customtkinter.CTkFrame(master=root,width=300,height=150,corner_radius=20,border_color='Green',border_width=2)
+result_frame_label=customtkinter.CTkLabel(master=result_output_frame,text=' ',width=145,height=17,corner_radius=20,
+                                          font=fcg15)
+result_frame_label.place(relx=0.5,rely=0.5,anchor=CENTER)
+result_output_frame.place(relx=0.85,rely=0.67,anchor=CENTER)
+
 #Error Label
 error_lbl_main=customtkinter.CTkLabel(master=root,text='',width=400,height=30,font=fcg20,text_color='Red')
 error_lbl_main.place(relx=0.01,rely=0.94)
 
 #Exit Button 
-exit_button = customtkinter.CTkButton(master=root, text= "Exit", command=root.destroy,width=200,height=40,corner_radius=20,font=fcg20,
+exit_button = customtkinter.CTkButton(master=root, text= "Exit", command=root.destroy,width=200,height=40,corner_radius=20,font=fcgbtn,
                                       hover_color='Red4')
-exit_button.place(relx=0.9,rely=0.95,anchor=CENTER)
+exit_button.place(relx=0.88,rely=0.93,anchor=CENTER)
 
 #looping root
 root.mainloop()
